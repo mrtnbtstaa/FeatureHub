@@ -1,0 +1,1 @@
+export type FeatureStatus = "All" | "Planned" | "In Progress" | "Completed";

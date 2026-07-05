@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Users {
+  id String @id @db.Uuid
+  email String @unique // Email must be unique
+  name String
+  createdAt DateTime @default(now())
+  
+  profile Profile? // 1:1 Relationship
+  comments Comments[] // 1:Many
+  features Features[] // 1:Many
+}
+
+model Profile{
+  id String @id @default(uuid()) @db.Uuid
+  avatarUrl String? // Optional incase your hasnt uploaded an avatar yet.
+  
+  // User reference relationship
+  user       Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String   @unique @db.Uuid
+}
+
+model Features {
+  id                 String   @id @default(uuid()) @db.Uuid
+  createdAt          DateTime @default(now())
+  status             String
+  featureTitle       String
+  featureDescription String
+  featureImage       String
+  upvotes            BigInt   @default(0)
+
+  comments Comments[] // Back-relation: A feature can have many comments
+
+  // User relationship reference
+  user       Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String    @db.Uuid
+
+  @@index([id]) // Indexing
+}
+
+model Comments {
+  id String @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  message String
+
+  // Feature relationship reference
+  feature Features? @relation(fields: [featureId], references: [id])
+  featureId String @db.Uuid
+
+  // User relationship reference
+  user       Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String    @db.Uuid
+}

@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import LoaderPathTracker from "@/components/shared/Loader/LoaderPathTracker";
+import { Suspense } from "react";
+import Loader from "@/components/shared/Loader/Loader";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,11 +16,43 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en">
+      <body className="antialiased">
+        <Suspense fallback={null}>
+          <LoaderPathTracker />
+        </Suspense>
+        {
+          <Loader className="fixed flex items-center justify-center inset-0 z-50 bg-black/30 backdrop-blur-xs" />
+        }
+        {children}
+        <Toaster
+          position="bottom-right"
+          toasterId="default"
+          reverseOrder={false}
+          toastOptions={{
+            duration: 2000,
+            removeDelay: 1000,
+            style: {
+              padding: '16px',
+              border: 'none'
+            },
+            success: {
+              duration: 1500,
+              iconTheme: {
+                primary: "green",
+                secondary: "black",
+              },
+            },
+            error: {
+              duration: 1500,
+              iconTheme: {
+                primary: "red",
+                secondary: "black",
+              },
+            },
+          }}
+        />
+      </body>
     </html>
   );
 }
